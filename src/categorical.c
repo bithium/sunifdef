@@ -92,7 +92,7 @@ STATE_DEF(categorical) {
 IMPLEMENT(categorical,STATIC_INITABLE)
 
 USE_STATIC_INITIALISER(categorical) = {
-	{ -1 },
+	{CONTRADICTION_COMMENT, -1 },
 	 "//",
 	GRIPE_COMMENTED_CONTRADICTION
 };
@@ -272,7 +272,10 @@ weed_categorical_directive(int lineval)
 void
 contradiction_policy(contradiction_policy_t p)
 {
+	SET_PUBLIC(categorical,policy) = p;
+
 	switch(p){
+	case CONTRADICTION_KEEPSAME:
 	case CONTRADICTION_DELETE:
 		SET_STATE(categorical,contradiction_insert_prefix) = NULL;
 		SET_STATE(categorical,contradiction_insert_reason) =

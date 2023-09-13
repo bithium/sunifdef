@@ -398,6 +398,8 @@ usage(FILE * fp)
 			"(Default)\n"
 		"-xe, --conflict error\n"
 		"\t\tInsert diagnostic #errors on contradictions as per -xd.\n"
+		"-xk, --conflict keepsame\n"
+		"\t\tKeep #defines that equal to -D args.\n"
 		"-g[p|i|w|e|a],\n"
 		"--gag [progress| info | warning | error | abend]\n"
 		"\t\tSuppress diagnostics no worse than "
@@ -926,6 +928,9 @@ parse_args(int argc, char *argv[])
 					else if (!strcmp(optarg,"error")) {
 						conflict_policy = CONTRADICTION_ERROR;
 					}
+					else if (!strcmp(optarg,"keepsame")) {
+						conflict_policy = CONTRADICTION_KEEPSAME;
+					}
 					else {
 						usage_error(GRIPE_USAGE_ERROR,
 							"Invalid argument for --conflict: \"%s\"",optarg);
@@ -941,6 +946,9 @@ parse_args(int argc, char *argv[])
 						break;
 					case 'e':
 						conflict_policy = CONTRADICTION_ERROR;
+						break;
+					case 'k':
+						conflict_policy = CONTRADICTION_KEEPSAME;
 						break;
 					default:
 						usage_error(GRIPE_USAGE_ERROR,

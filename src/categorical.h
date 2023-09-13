@@ -58,7 +58,9 @@ typedef enum contradiction_policy {
 	/*! Replace conflicting directives with diagnostic comments */ 
 	CONTRADICTION_COMMENT,
 	/*! Replace conflicting directives with \c #error directives */ 
-	CONTRADICTION_ERROR
+	CONTRADICTION_ERROR,
+	/*! Keep 'conflicting' directives */
+	CONTRADICTION_KEEPSAME,
 } contradiction_policy_t;
 
 
@@ -169,6 +171,8 @@ save_contradiction(char const *sub_format);
 
 /*! The public state of the Categorical module */
 PUBLIC_STATE_DEF(categorical) {
+	/*! Configured contradiction policy */
+	contradiction_policy_t policy;
 	/*! Line number of the last \c #undef that contradicts a \c --define */
 	int		last_contradictory_undef;
 } PUBLIC_STATE_T(categorical);

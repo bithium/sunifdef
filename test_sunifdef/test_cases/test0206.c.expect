@@ -1,0 +1,5 @@
+/**ARGS: -xk -DFOO1 -UFOO2 */
+/**SYSCODE: = 1 | 16 */
+#define FOO1
+KEEP ME
+

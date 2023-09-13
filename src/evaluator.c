@@ -746,6 +746,8 @@ eval_define(char **cpp)
 			functionoid = true; /* #defining a function-type macro */
 			break;
 		}
+		bool keepsame = GET_PUBLIC(categorical,policy) == CONTRADICTION_KEEPSAME;
+
 		/* Not functionoid macro, so enter PSEUDO_COMMENT state now */
 		SET_PUBLIC(chew,comment_state) = PSEUDO_COMMENT;
 		SET_PUBLIC(chew,last_comment_start_line) = GET_PUBLIC(io,line_num);
@@ -768,9 +770,14 @@ eval_define(char **cpp)
 			/* str1 is identical with -D value */
 			cp = chew_on(str);
 			str = chew_sym(cp);	/* But is there a str2? */
-			retval = (cp == str) ?
-				LT_CONSISTENT_DEFINE_DROP :	/* No str2. */
-				LT_DIFFERING_DEFINE;  /* There is a str2 */
+			if(cp == str) /* No str2. */ {
+				retval = keepsame ? LT_CONSISTENT_DEFINE_KEEP : LT_CONSISTENT_DEFINE_DROP;
+				if(retval == LT_CONSISTENT_DEFINE_KEEP) {
+					queue_line_entry();
+				}
+			} else /* There is a str2 */ {
+				retval = LT_DIFFERING_DEFINE;
+			}
 			break;
 		}
 		/* #define sym */
@@ -778,7 +785,10 @@ eval_define(char **cpp)
 			if (cursym == GET_PUBLIC(categorical,last_contradictory_undef)) {
 				forget_contradiction();
 			}
-			retval = LT_CONSISTENT_DEFINE_DROP;
+			retval = keepsame ? LT_CONSISTENT_DEFINE_KEEP : LT_CONSISTENT_DEFINE_DROP;
+			if(retval == LT_CONSISTENT_DEFINE_KEEP) {
+				queue_line_entry();
+			}
 		}
 		else {
 			retval = LT_DIFFERING_DEFINE;

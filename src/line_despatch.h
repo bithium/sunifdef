@@ -54,6 +54,10 @@
 /*!	\addtogroup line_despatch_interface */
 /*@{*/
 
+/*!	Enqueue a #line print */
+extern void
+queue_line_entry(void);
+
 /*!	Print the line-buffer to output */
 extern void
 print(void);

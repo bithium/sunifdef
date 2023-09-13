@@ -266,6 +266,14 @@ line_despatch_no_op(void)
 }
 
 void
+queue_line_entry(void)
+{
+	if (GET_PUBLIC(args,line_directives)) {
+		++SET_STATE(line_despatch,drop_run);
+	}
+}
+
+void
 print(void)
 {
 	if (GET_PUBLIC(args,line_directives)) {
@@ -289,9 +297,7 @@ void
 drop(void)
 {
 	GET_STATE(line_despatch,flushline)(false,NULL);
-	if (GET_PUBLIC(args,line_directives)) {
-		++SET_STATE(line_despatch,drop_run);
-	}
+	queue_line_entry();
 }
 
 void
