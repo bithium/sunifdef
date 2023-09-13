@@ -1,0 +1,10 @@
+root = true
+
+[*.sh]
+end_of_line = lf
+
+[*.ac]
+end_of_line = lf
+
+[*.am]
+end_of_line = lf

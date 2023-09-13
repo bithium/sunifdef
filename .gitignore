@@ -9,3 +9,4 @@ src/sunifdef
 stamp-h1
 test_sunifdef/test_cases/*.c.output
 test_sunifdef/test_cases/*.c.stderr
+autom4te.cache/

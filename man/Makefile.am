@@ -11,7 +11,7 @@ distclean:
 	rm -f Makefile
 
 man:	sunifdef.1
- 
+
 sunifdef.1: man_pod.pl makeman.sh
-	./makeman.sh	
+	./makeman.sh
 

@@ -2,6 +2,8 @@
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 1.4
 
+ACLOCAL_AMFLAGS=-I m4
+
 EXTRA_DIST := man/sunifdef.1 man/html/sunifdef_man_1.html man/makeman.sh man/man_pod.pl\
 test_sunifdef/scrap_dir_tree.pl test_sunifdef/sunifdef_case_tester.pl \
 test_sunifdef/sunifdef_bulk_tester.pl test_sunifdef/sunifdef_softlink_tester.pl \
