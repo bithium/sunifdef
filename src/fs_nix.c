@@ -45,9 +45,10 @@
 
 #ifdef UNIX
 
+#include <dirent.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <dirent.h>
 #include "filesys.h"
 #include "report.h"
 
@@ -150,12 +151,16 @@ fs_read_dir(fs_dir_t dir, char const **fullname)
 	char *filename = NULL;
 	fs_dir_nix_t * nix_dir = dir;
 	struct dirent * entry;
-	int res = readdir_r(nix_dir->dir,&nix_dir->entry,&entry);
-	if (res) {
+
+	errno = 0;
+	entry = readdir(nix_dir->dir);
+
+    if (entry == NULL && errno != 0) {
 		bail(GRIPE_CANT_READ_DIR,"Read error on directory \"%s\"",
 			nix_dir->dirname);
 	}
 	if (entry) {
+		memcpy(&(nix_dir->entry), entry, sizeof(struct dirent));
 		filename = nix_dir->entry.d_name;
 		if (filename[0] == '.' &&
 			((filename[1] == '.' && filename[2] == '\0') || filename[1] == '\0')) {
