@@ -751,7 +751,13 @@ eval_define(char **cpp)
 		/* Not functionoid macro, so enter PSEUDO_COMMENT state now */
 		SET_PUBLIC(chew,comment_state) = PSEUDO_COMMENT;
 		SET_PUBLIC(chew,last_comment_start_line) = GET_PUBLIC(io,line_num);
-		cp = chew_on(cp);
+		/* Skip space to search for #define parameter */
+		for (; isspace((unsigned char)*cp); ++cp) {
+			if (EOL(cp)) {
+				cp = chew_on(cp);
+				break;
+			}
+		}
 		if (*cp != '\0') {
 			/* #define sym str1 [str2..] */
 			char *str = chew_str(cp);
