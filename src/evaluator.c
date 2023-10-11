@@ -763,6 +763,18 @@ eval_define(char **cpp)
 			char *str = chew_str(cp);
 			size_t def_len = strlen(def);
 			size_t val_len = str - cp;
+			/* Check of str1 as integer matches -D as integer */
+			long val_def, val_cp;
+			char *end_def, *end_cp;
+			val_def = strtol (def, &end_def, 0);
+			val_cp = strtol (cp, &end_cp, 0);
+			if (end_def != def && end_cp != cp && val_def == val_cp) {
+				retval = keepsame ? LT_CONSISTENT_DEFINE_KEEP : LT_CONSISTENT_DEFINE_DROP;
+				if(retval == LT_CONSISTENT_DEFINE_KEEP) {
+					queue_line_entry();
+				}
+				break;
+			}
 			if (strncmp(def,cp,def_len)) {
 				/* str1 differs from -D value within length of value */
 				retval = LT_DIFFERING_DEFINE;
