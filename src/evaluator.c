@@ -1575,12 +1575,14 @@ eval_line(void)
 				}
 			}
 		}
-		else if (strncmp(GET_PUBLIC(line_edit,keyword),"define",kwlen) == 0) {
+		else if (GET_PUBLIC(line_edit,keyword)[0] == 'd' && kwlen >= 6 &&
+			     strncmp(GET_PUBLIC(line_edit,keyword),"define",kwlen) == 0) {
 			if (!symbols_policy && !dropping_line()) {
 				retval = eval_define(&cp);
 			}
 		}
-		else if (strncmp(GET_PUBLIC(line_edit,keyword),"undef",kwlen) == 0 ) {
+		else if (GET_PUBLIC(line_edit,keyword)[0] == 'u' && kwlen >= 5 &&
+			     strncmp(GET_PUBLIC(line_edit,keyword),"undef",kwlen) == 0 ) {
 			if (!symbols_policy && !dropping_line()) {
 				retval = eval_undef(&cp);
 			}
@@ -1631,4 +1633,3 @@ eval_line(void)
 
 
 /* EOF */
-
