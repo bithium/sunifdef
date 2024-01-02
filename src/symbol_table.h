@@ -62,7 +62,7 @@
  *	\param ch	 The character to test.
  */
 #define symchar(ch) \
-	(isalnum((unsigned)ch) || (ch) == '_')
+	(isalnum((unsigned)ch) || (ch) == '_' || (ch) == '@' || (ch) == '$' || (ch) == '{' || (ch) == '}' )
 
 /*! Lookup an identifier in the symbol table.
  * \param str	Start of the identifier to match with symbols in the table.

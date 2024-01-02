@@ -124,9 +124,7 @@ in_quotation(void)
 char *
 chew_sym(char *cp)
 {
-	if (isalpha(*cp) || *cp == '_') {
-		for (	;symchar(*cp); ++cp, cp = chew_continuation(cp)){}
-	}
+	for (;symchar(*cp); ++cp, cp = chew_continuation(cp)){}
 	return (cp);
 }
 
@@ -324,4 +322,3 @@ chew_toplevel(void)
 }
 
 /* EOF */
-
