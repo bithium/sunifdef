@@ -748,9 +748,10 @@ eval_define(char **cpp)
 		}
 		bool keepsame = GET_PUBLIC(categorical,policy) == CONTRADICTION_KEEPSAME;
 
-		/* Not functionoid macro, so enter PSEUDO_COMMENT state now */
-		SET_PUBLIC(chew,comment_state) = PSEUDO_COMMENT;
+		/* Not functionoid macro, so enter NO_COMMENT state now */
+		SET_PUBLIC(chew,comment_state) = NO_COMMENT;
 		SET_PUBLIC(chew,last_comment_start_line) = GET_PUBLIC(io,line_num);
+
 		cp = chew_on(cp);
 		if (*cp != '\0') {
 			/* #define sym str1 [str2..] */
