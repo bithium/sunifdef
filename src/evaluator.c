@@ -878,6 +878,57 @@ eval_undef(char **cpp)
 	return retval;
 }
 
+/*!	Evaluate the text of a \c #cmakedefine directive.
+
+	\param cpp  Pointer to the address of the directive text. This
+				pointer is updated at exit with the address just past the
+				text consumed.
+
+	\return		A line-type, as follows:
+
+	Given a directive as \c #cmakedefine \c VAR:
+
+	- If neither \c --define \c VAR nor \c --undefine \c VAR, 
+	  return \c LT_CONSISTENT_DEFINE_KEEP
+
+	- If \c --define \c VAR, return \c LT_CONSISTENT_DEFINE_KEEP
+	- If \c --undefine \c VAR, return \c LT_CONSISTENT_DEFINE_DROP
+*/
+static int
+eval_cmakedefine(char **cpp)
+{
+	char const *def;
+	char * cp = *cpp;
+	int retval;
+	int cursym;
+	bool functionoid = false;
+	debug(DBG_13,line_len(*cpp),*cpp);
+	cp = chew_on(cp);
+	cursym = find_sym(cp,&cp);
+	if (cursym >= 0) {
+		def = SYMBOL(cursym)->sym_def;
+		if (def == NULL) {
+			retval = LT_CONSISTENT_DEFINE_DROP;	/* symbol is -Ued */
+		} else {
+			retval = LT_CONSISTENT_DEFINE_KEEP;	/* symbol is -Ded */
+		}
+	}
+	else {
+		retval = LT_CONSISTENT_DEFINE_KEEP;	/* symbol not -Ded or -Ued */
+	}
+
+	SET_PUBLIC(chew,comment_state) = PSEUDO_COMMENT;
+	SET_PUBLIC(chew,last_comment_start_line) = GET_PUBLIC(io,line_num);
+	cp = chew_on(cp);
+	if (*cp != '\0') {
+		give_up_confused();
+	}
+
+	debug(DBG_14,line_len(*cpp),*cpp,retval);
+	*cpp = cp;
+	return retval;
+}
+
 /*! Table-driven evaluation of binary operators.
   The evaluator does shortcircuit evaluation for && and ||.
   It also simplifies && and || subexpressions that
@@ -1576,6 +1627,12 @@ eval_line(void)
 			     strncmp(GET_PUBLIC(line_edit,keyword),"undef",kwlen) == 0 ) {
 			if (!symbols_policy && !dropping_line()) {
 				retval = eval_undef(&cp);
+			}
+		}
+		else if (GET_PUBLIC(line_edit,keyword)[0] == 'c' && kwlen >= 11 &&
+			     strncmp(GET_PUBLIC(line_edit,keyword),"cmakedefine", 11) == 0) {
+			if (!symbols_policy && !dropping_line()) {
+				retval = eval_cmakedefine(&cp);
 			}
 		}
 		else {
