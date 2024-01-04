@@ -523,7 +523,7 @@ debug(dbg_code_t how,...)
 			vreport(MSGCLASS_NONE,NULL,"eval%d bad expr",ap);
 			break;
 		case DBG_7:
-			vreport(MSGCLASS_NONE,NULL,"eval%d = %d",ap);
+			vreport(MSGCLASS_NONE,NULL,"eval%d = %l",ap);
 			break;
 		case DBG_8:
 			vreport(MSGCLASS_NONE,NULL,"eval%d",ap);
@@ -532,13 +532,13 @@ debug(dbg_code_t how,...)
 			vreport(MSGCLASS_NONE,NULL,"eval%d %s",ap);
 			break;
 		case DBG_10:
-			vreport(MSGCLASS_NONE,NULL,"eval%d = %d",ap);
+			vreport(MSGCLASS_NONE,NULL,"eval%d = %l",ap);
 			break;
 		case DBG_11:
 			vreport(MSGCLASS_NONE,NULL,"eval %s",ap);
 			break;
 		case DBG_12:
-			vreport(MSGCLASS_NONE,NULL,"eval = %d",ap);
+			vreport(MSGCLASS_NONE,NULL,"eval = %l",ap);
 			break;
 		case DBG_13:
 			vreport(MSGCLASS_NONE,NULL,"eval #define %.*s",ap);
@@ -738,5 +738,3 @@ concatenate(size_t count, char *strs[], int punctch)
 
 
 /* EOF */
-
-

@@ -57,6 +57,7 @@
 #include <math.h>
 #include <limits.h>
 #include <assert.h>
+#include <stdint.h>
 
 /*!\ingroup evaluator_module evaluator_internals evaluator_interface
  *
@@ -186,7 +187,7 @@
 
 /*! Assign a value in an \em eval_result_t */
 static void
-set_value(eval_result_t *result, int val)
+set_value(eval_result_t *result, long val)
 {
 	result->value = val;
 	SET_FLAGS(*result,val ? EVAL_TRUE : EVAL_FALSE);
@@ -969,9 +970,11 @@ list_symbol(	symbols_policy_t policy,
 	\param	num	The putative numeral, 0-terminated.
 	\param	numend	The address terminating any valid numeral is stored
 		here on return.
-	\return The double float value of any decimal, octal, or hex numeral
-		commencing at \e num, or 0 is there is no such numeral, or HUGE_VAL
-		if the integer value of the numeral exceeds INT_MAX.
+	\param  res  Pointer to where the parsed value will be placed.
+
+	\retval true  if a value was parsed successfully.
+	\retval false if a value could not be parsed or there was a overflow, i.e.
+	              value outside the range [-UINT_MAX, UINT_MAX].
 
 	If the number \e N of characters \e *numend - \e num is > 0 at return then
 	then those \e N characters comprise the evaluated numeral. If \e *numend
@@ -981,21 +984,18 @@ list_symbol(	symbols_policy_t policy,
 	The string "0x" or "0X" is parsed as a valid numeral "0" followed
 	by 'x' or 'X'.
 
-	The return value != HUGE_VAL for validity. If valid, may be cast to
-	\c int without loss.
-
 	This function is more serviceable that \e strtol() for evaluating
-	preprocessor integer constants since a seperate invocation of the
+	preprocessor integer constants since a separate invocation of the
 	latter would be required for each possible base 8, 10, 16.
 
 */
-static double
-eval_numeral(char const *num, char const **numend)
+static bool
+eval_numeral(char const *num, char const **numend, long *res)
 {
 	int sign = 1;
 	int base = 10;
 	int dval = 0;
-	int val = 0;
+	long val = 0;
 	bool overflow = false;
 	size_t num_len = 0;
 	char const *start = num;
@@ -1080,17 +1080,11 @@ eval_numeral(char const *num, char const **numend)
 			dval = 16;
 		}
 		if (dval < base) {
-			int tmp = val;
 			val *= base;
-			if ((val / base != tmp) || (val<tmp)) {
-				overflow = true;
-			}
-			else {
-				tmp = val;
-				val += dval;
-				if (val - dval != tmp) {
-					overflow = true;
-				}
+			val += dval;
+			if (val > UINT_MAX) {
+			   overflow = true;
+			   break;
 			}
 		}
 		else {
@@ -1113,11 +1107,14 @@ eval_numeral(char const *num, char const **numend)
 	if (overflow) {
 		report(GRIPE_INT_OVERFLOW,NULL,
 			"Integer constant \"%.*s\" is too big for sunifdef "
-			"(max %d): expression will not be resolved",
-			num - start,start,INT_MAX);
-		return HUGE_VAL;
+			"(max %u): expression will not be resolved",
+			num - start,start, UINT_MAX);
+		return false;
 	}
-	return sign * val;
+   
+    *res = sign * val; 
+
+	return true;
 }
 
 /*!		Evaluate a symbol.
@@ -1157,8 +1154,8 @@ eval_symbol(eval_result_t *symbol)
 	}
 	else {
 		char const *numend;
-		double val = eval_numeral(symdef,&numend);
-		if (val != HUGE_VAL) {
+		long val = 0;
+		if (eval_numeral(symdef,&numend, &val)) {
 			if (*numend != '\0' || numend == symdef) {
 				/* Value of symbol is not an integer.
 					Is it an expression? */
@@ -1253,11 +1250,10 @@ eval_unary(const struct ops *ops, char **cpp)
 			result.value = -result.value;
 		}
 		else if (isdigit((unsigned char)*cp)) {
-			double val;
+			long val;
 			debug(DBG_3,ops - eval_ops);
-			val = eval_numeral(cp,&ep);
-			if (val != HUGE_VAL) {
-				result.value = (int)val;
+			if (eval_numeral(cp,&ep, &val)) {
+				result.value = val;
 				if (!GET_STATE(evaluator,parsing_sym_def)) {
 					SET_CONST(result);
 					if (!GET_PUBLIC(args,del_consts)) {

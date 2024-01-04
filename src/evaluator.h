@@ -134,7 +134,7 @@ typedef struct eval_result {
 	char * sym_def;
 		/*!< Definition of symbol, if text assigns a
 			definition to a symbol */
-	int value;
+	long value;
 		/*!< The value of text if it is a soluble
 			expression  */
 	int flags;
